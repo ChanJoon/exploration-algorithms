@@ -586,7 +586,7 @@
   git clone https://github.com/aakapatel/mav_control_rw.git
   ```
   
-  If you want to use LTU-RAI lab version of `rotors_simulator`, install as follows:
+  **[Recommended]** If you want to use LTU-RAI lab version of `rotors_simulator`, install as follows:
   ```shell
   git clone https://github.com/LTU-RAI/rotors_simulator.git && cd rotors_simulator && git pull
   ```
@@ -601,6 +601,20 @@
   git clone https://github.com/LTU-RAI/ExplorationRRT.git
   /bin/bash -c 'source $HOME/.cargo/env; cd /home/$USERNAME/catkin_ws/src/ExplorationRRT; python3 rrt_costgen.py'
   catkin build errt
+  ```
+
++ Download gazebo models provied in errt (if you want)
+  ```shell
+  cd ExplorationRRT/docker
+  gdown --id 1TDbXF9He_LXYY57Xo3tOxvEVYH3kPtS8
+  gdown --id 1y7BDt0tjK9Ml7MlTxUwOTG8ZygO_dpI0
+  unzip models.zip 
+  unzip ignition_models.zip 
+  ```
+
+  In your `.bashrc` or `.zshrc`, add downloaded models directory in `GAZEBO_MODEL_PATH`
+  ```shell
+  export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:~/<your_ws>/src/ExplorationRRT/docker/ignition_models:~/<your_ws>/src/ExplorationRRT/docker/models
   ```
 </details>
 
@@ -787,5 +801,6 @@
   roslaunch mav_linear_mpc mav_linear_mpc_sim.launch mav_name:=hummingbird
   rosservice call /hummingbird/takeoff "{}"
   ```
+  Note: `errt_mav.launch` only works for LTU-RAI version of `rotors_gazebo`. Set up your own rotors launch for your custom world file.
 
 </details>
