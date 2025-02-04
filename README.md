@@ -15,6 +15,7 @@
   + GLocal - A Unified Approach for Autonomous Volumetric Exploration of Large Scale Environments Under Severe Odometry Drift
   + OIPP - An Efficient Sampling-Based Method for Online Informative Path Planning in Unknown Environments
   + PredRecon - PredRecon: A Prediction-boosted Planning Framework for Fast and High-quality Autonomous Aerial Reconstruction
+  - ERRT - A Tree-based Next-best-trajectory Method for 3D UAV Exploration
 
 <br>
 
@@ -32,6 +33,7 @@
 |     FUEL    |                                      [2021 RAL](https://ieeexplore.ieee.org/document/9324988)                                     |                                           [youtube](https://youtu.be/_dGgZUrWk-8)                                           |    [git](https://github.com/HKUST-Aerial-Robotics/FUEL)   | HKUST Aerial Robotics Group |
 |     DSVP    |                                     [2021 IROS](https://ieeexplore.ieee.org/document/9636473)                                     |                                           [youtube](https://youtu.be/1yLLIZIIsDk)                                           |      [git](https://github.com/HongbiaoZ/dsv_planner)      |    CMU Robotics Institute   |
 |     TARE    |      [2021 RSS](http://www.roboticsproceedings.org/rss17/p018.pdf), [2021 ICRA](https://ieeexplore.ieee.org/document/9561916)     |                                           [youtube](https://youtu.be/pIo64S-uOoI)                                           |      [git](https://github.com/caochao39/tare_planner)     |    CMU Robotics Institute   |
+|     ERRT    |                                          [2024 T-RO](https://ieeexplore.ieee.org/document/10582913)                               |                                           [youtube](https://youtu.be/R2J-dpVL57M)                                           |     [git](https://github.com/LTU-RAI/ExplorationRRT)      |         LTU-RAI             |
 
 ## 2. Volumetric mapping + Considering pose estimation
 
@@ -187,11 +189,12 @@
 #### 1-1. Install PX4-SITL - for AEP
 + Follow [here](https://github.com/engcang/mavros-gazebo-application/blob/master/README.md#installation)
 
-#### 1-2. Install RotorS Simulator - for NBVP, GBP, MBP, OIPP
+#### 1-2. Install RotorS Simulator - for NBVP, GBP, MBP, OIPP, ERRT
 + Because of the version issuse, I recommend to install as here
 + Get the code and build
   ```shell
   cd ~/catkin_ws/src
+  git clone https://github.com/ethz-asl/glog_catkin.git
   git clone https://github.com/ethz-asl/rotors_simulator --recursive
   rm -r rotors_simulator/rotors_description
   rm -r rotors_simulator/rotors_gazebo
@@ -503,6 +506,104 @@
 
 </details>
 
+#### 2-10. ERRT
+<details><summary>Unfold to see</summary>
+
++ Install dependencies
+  ```shell
+  sudo apt-get update
+  sudo apt-get --with-new-pkgs upgrade -y
+  sudo apt-get install -y mesa-utils \
+                          libgl1-mesa-glx \
+                          vim \
+                          tmuxinator \
+                          python3-catkin-tools \
+                          python3-osrf-pycommon \
+                          python3-pip \
+                          libtbb-dev \
+                          ros-noetic-octomap-server \
+                          ros-noetic-octomap-ros \
+                          ros-noetic-octomap-rviz-plugins \
+                          ros-noetic-octomap-mapping \
+                          libtool \
+                          libgoogle-glog-dev \
+                          libnlopt-dev \
+                          libsuitesparse-dev \
+                          ros-noetic-nlopt \
+                          liblapacke-dev \
+                          ros-noetic-gtsam \
+                          ros-noetic-rosmon \
+                          iputils-ping \
+                          apt-transport-https ca-certificates \
+                          openssh-server python3-pip exuberant-ctags \
+                          git vim tmux nano htop sudo curl wget gnupg2 \
+                          bash-completion \
+                          libcanberra-gtk3-0 \
+                          ros-noetic-gmapping ros-noetic-slam-gmapping ros-noetic-openslam-gmapping \
+                          ros-noetic-joy \
+                          ros-noetic-twist-mux \
+                          ros-noetic-interactive-marker-twist-server \
+                          ros-noetic-fath-pivot-mount-description \
+                          ros-noetic-flir-camera-description \
+                          ros-noetic-realsense2-description \
+                          ros-noetic-lms1xx \
+                          ros-noetic-robot-localization \
+                          ros-noetic-teleop-twist-keyboard \
+                          ros-noetic-teleop-twist-joy \
+                          ros-noetic-rviz-imu-plugin \
+                          ros-noetic-gmapping \
+                          ros-noetic-mavros-msgs \
+                          ros-noetic-move-base-msgs \
+                          ros-noetic-tf2-sensor-msgs \
+                          python3-catkin-tools \
+                          python3-osrf-pycommon \
+                          libtbb-dev \
+                          qtbase5-dev \
+                          qtdeclarative5-dev \
+                          libqt5x11extras5-dev
+  pip3 install opengen
+  pip3 install gdown
+
+  curl https://sh.rustup.rs -sSf | sh -s -- -y
+  # Add Rust binaries to the PATH
+  RUN echo "source $HOME/.cargo/env" >> /home/$USER_NAME/.bashrc
+  ```
++ Install ROS dependencies
+  ```shell
+  git clone https://github.com/ethz-asl/eigen_checks.git
+  git clone https://github.com/catkin/catkin_simple.git
+  git clone https://github.com/ethz-asl/eigen_catkin.git
+  git clone https://github.com/ntnu-arl/lidar_simulator.git
+  git clone https://github.com/ethz-asl/mav_comm.git
+  git clone https://github.com/ros-planning/navigation_msgs.git
+  git clone https://github.com/ethz-asl/numpy_eigen.git
+  git clone --branch melodic-devel https://github.com/ros-perception/perception_pcl.git
+  git clone https://github.com/ros/xacro.git
+  git clone https://github.com/ethz-asl/catkin_boost_python_buildtool.git
+  git clone https://github.com/LTU-RAI/darpa_subt_worlds.git
+  git clone https://github.com/LTU-RAI/ufomap.git
+  git clone https://github.com/LTU-RAI/geometry2.git
+  git clone https://github.com/aakapatel/mav_control_rw.git
+  ```
+  
+  If you want to use LTU-RAI lab version of `rotors_simulator`, install as follows:
+  ```shell
+  git clone https://github.com/LTU-RAI/rotors_simulator.git && cd rotors_simulator && git pull
+  ```
+
++ Add compiler option `c++17` in `rotors_gazebo_plugins`
+  ```shell
+  add_compile_options(-std=c++17)
+  ```
+
++ Get the source code and build (NOTE: modify cargo build target path correctly)
+  ```shell
+  git clone https://github.com/LTU-RAI/ExplorationRRT.git
+  /bin/bash -c 'source $HOME/.cargo/env; cd /home/$USERNAME/catkin_ws/src/ExplorationRRT; python3 rrt_costgen.py'
+  catkin build errt
+  ```
+</details>
+
 <br>
 
 ## Run Demos
@@ -671,6 +772,20 @@
   ```shell
   roslaunch active_3d_planning_app_reconstruction no_unreal_run_experiment.launch
   rosservice call /planner/planner_node/toggle_running "data: true"
+  ```
+
+</details>
+
+#### 10. ERRT
+<details><summary>Unfold to see</summary>
+
++ Run demo
+  ```shell
+  roslaunch errt server.launch
+  roslaunch errt errt.launch
+  roslaunch rotors_gazebo errt_mav.launch
+  roslaunch mav_linear_mpc mav_linear_mpc_sim.launch mav_name:=hummingbird
+  rosservice call /hummingbird/takeoff "{}"
   ```
 
 </details>
